@@ -115,6 +115,7 @@ class Nuki():
         self.config.set(self.macAddress, 'ID', ID)
         self.config.set(self.macAddress, 'IDType', IDType)
         self.config.set(self.macAddress, 'Name', name)
+        self.config.set(self.macAddress, 'DeviceType', DeviceType)
         print("Public key received: %s" % commandParsed.publicKey)
         publicKeyPush = nuki_messages.Nuki_PUBLIC_KEY(publicKeyHex)
         publicKeyPushCommand = publicKeyPush.generate()
@@ -206,11 +207,11 @@ class Nuki():
         return response
 
     @retry(Exception, tries=8, delay=0.5)
-    def getHandle(self, DeviceType):
+    def getHandle(self):
         print("Retrieving handle")
-        keyturnerUSDIOHandle = self.device.get_handle('a92ae202-5501-11e4-916c-0800200c9a66' if DeviceType == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66')
+        keyturnerUSDIOHandle = self.device.get_handle('a92ae202-5501-11e4-916c-0800200c9a66' if self.config.get(self.macAddress, 'DeviceType') == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66')
         print("Handle retrieved")
-        self.device.subscribe('a92ae202-5501-11e4-916c-0800200c9a66' if DeviceType == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66', self._handleCharWriteResponse, indication=True)
+        self.device.subscribe('a92ae202-5501-11e4-916c-0800200c9a66' if self.config.get(self.macAddress, 'DeviceType') == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66', self._handleCharWriteResponse, indication=True)
         print("Subscribed to device")
         return keyturnerUSDIOHandle
     
@@ -261,10 +262,10 @@ class Nuki():
 
     # method to fetch the number of log entries from your Nuki Lock
     #	-pinHex : a 2-byte hex string representation of the PIN code you have set on your Nuki Lock (default is 0000)
-    def getLogEntriesCount(self, pinHex, DeviceType):
+    def getLogEntriesCount(self, pinHex):
         self._makeBLEConnection()
-        keyturnerUSDIOHandle = self.device.get_handle('a92ae202-5501-11e4-916c-0800200c9a66' if DeviceType == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66')
-        self.device.subscribe('a92ae202-5501-11e4-916c-0800200c9a66' if DeviceType == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66', self._handleCharWriteResponse, indication=True)
+        keyturnerUSDIOHandle = self.device.get_handle('a92ae202-5501-11e4-916c-0800200c9a66' if self.config.get(self.macAddress, 'DeviceType') == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66')
+        self.device.subscribe('a92ae202-5501-11e4-916c-0800200c9a66' if self.config.get(self.macAddress, 'DeviceType') == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66', self._handleCharWriteResponse, indication=True)
         challengeReq = nuki_messages.Nuki_REQ('0004')
         challengeReqEncrypted = nuki_messages.Nuki_EncryptedCommand(
             authID=self.config.get(self.macAddress, 'authorizationID'), nukiCommand=challengeReq,
@@ -310,8 +311,8 @@ class Nuki():
     #	-pinHex : a 2-byte hex string representation of the PIN code you have set on your Nuki Lock (default is 0000)
     def getLogEntries(self, count, pinHex, DeviceType):
         self._makeBLEConnection()
-        keyturnerUSDIOHandle = self.device.get_handle('a92ae202-5501-11e4-916c-0800200c9a66' if DeviceType == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66')
-        self.device.subscribe('a92ae202-5501-11e4-916c-0800200c9a66' if DeviceType == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66', self._handleCharWriteResponse, indication=True)
+        keyturnerUSDIOHandle = self.device.get_handle('a92ae202-5501-11e4-916c-0800200c9a66' if self.config.get(self.macAddress, 'DeviceType') == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66')
+        self.device.subscribe('a92ae202-5501-11e4-916c-0800200c9a66' if self.config.get(self.macAddress, 'DeviceType') == 'op' else 'a92ee202-5501-11e4-916c-0800200c9a66', self._handleCharWriteResponse, indication=True)
         challengeReq = nuki_messages.Nuki_REQ('0004')
         challengeReqEncrypted = nuki_messages.Nuki_EncryptedCommand(
             authID=self.config.get(self.macAddress, 'authorizationID'), nukiCommand=challengeReq,
