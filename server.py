@@ -33,7 +33,7 @@ def get_config():
     return config
 
 @app.route("/connect/<mac_address>/<name>/<device_type>")
-def connect(mac_address, name):
+def connect(mac_address, name, device_type):
     # generate the private key which must be kept secret
     keypair = PrivateKey.generate()
     myPublicKeyHex = keypair.public_key.__bytes__().hex()
