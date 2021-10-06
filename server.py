@@ -32,7 +32,7 @@ print(config)
 def get_config():
     return config
 
-@app.route("/connect/<mac_address>/<name>")
+@app.route("/connect/<mac_address>/<name>/<device_type>")
 def connect(mac_address, name):
     # generate the private key which must be kept secret
     keypair = PrivateKey.generate()
@@ -42,7 +42,7 @@ def connect(mac_address, name):
     # id-type = 00 (app), 01 (bridge) or 02 (fob)
     # take 01 (bridge) if you want to make sure that the 'new state available'-flag is cleared on the Nuki if you read it out the state using this library
     myIDType = '01'
-    nuki.Nuki(mac_address, configfile).authenticateUser(myPublicKeyHex, myPrivateKeyHex, myID, myIDType, name)
+    nuki.Nuki(mac_address, configfile).authenticateUser(myPublicKeyHex, myPrivateKeyHex, myID, myIDType, name, device_type)
     config = parse_config()
     print(config)
     return "Connected to " + mac_address
